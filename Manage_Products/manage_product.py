@@ -6,11 +6,9 @@ class Product: #class
         self.price = price
         self.qty = qty
 
-    def display(self): #display  // I have to fix at this display
-        print(f"ID: {self.mid}")
-        print(f"Name: {self.name}")
-        print(f"Price:${self.price}")
-        print(f"Quatity: {self.qty}")
+    def display(self): #display  // I have to fix  this display
+        # FIXED
+        print(f"{self.mid:<5} | {self.name:<20} | ${self.price:<8} | {self.qty:<8}")
 
 
 class Manage_Medicine: #class
