@@ -8,6 +8,8 @@ class Product: #class
 
     def display(self): #display  // I have to fix  this display
         # FIXED
+        print(f"{'ID':<5} | {'Name':<20} | {'Price':<8} | {'Qty':<8}")
+        print("-"*50)
         print(f"{self.mid:<5} | {self.name:<20} | ${self.price:<8} | {self.qty:<8}")
 
 
