@@ -1,4 +1,5 @@
 #DAY1
+import csv
 class Product: #class 
     def __init__(self,mid,name,price,qty,): #constructor
         self.mid = mid
@@ -15,9 +16,33 @@ class Product: #class
 
 class Manage_Medicine: #class
     # Read data and store
+# DAY3
+    #///////////////////////////////////////////////////////
+    def save_data(self):
+        with open("medicine.csv","w",newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["ID","Name","Price","Qty"])
+
+            for m in self.medicines:
+                writer.writerow([m.mid,m.name,m.price,m.qty])
+
+    def load_data(self):
+        try:
+            with open("medicine.csv","r") as file:
+                reader = csv.reader(file)
+                next(reader)
+
+                for row in reader:
+                    medicines = Product(row[0],row[1],float(row[2]),int(row[3]))
+                    self.medicines.append(medicines)
+        except:
+            pass
+    
     def __init__(self):
         self.medicines = []
-    
+        self.load_data()
+
+    #///////////////////////////////////////////////////////////
         # Add Medicine
     def add_medicine(self):
         print("\n=====ADD MEDICINE======")
@@ -28,13 +53,15 @@ class Manage_Medicine: #class
 
         medicines = Product(mid,name,price,qty)
         self.medicines.append(medicines)
+        #add + fix 
+        self.save_data()
         #color
         print("\033[92mMedicine Added Seccessfully!\033[0m")
       
 #DAY2
         # View Medicine
     def view_medicine(self):
-        print("\n=====MEDICINES LIST=====")
+        print("\n=================MEDICINES LIST===================")
         if len(self.medicines) == 0:
             print("\033[91mNo Medicines Available.\033[0m")
         else:
@@ -59,32 +86,31 @@ class Manage_Medicine: #class
         for m in self.medicines:
             if m.mid == mid:
                 self.medicines.remove(m)
+                 # Add + fix
+                self.save_data()
                 print("\033[92Medicine Deleted!\033[m0")
                 return
-            print("\033[91Medicine Not found!\033[0m")
+        print("\033[91mMedicine Not found!\033[0m")
+           
 
         # Update Medicine Stock
     def update_medicine_stock(self):
         print("\n=====UPDATE MEDICINE STOCK=====")
 
-        print("Enter Medicine ID: ")
-        print("Enter Medicine Name:")
-        print("Enter Medicine Price: ")
-        print("Enter Medicine Quatity: ")
+        mid = input("Enter Medicine ID: ")
+        
         for m in self.medicines:
-            self.medicines.append(m)
-            print("\033[92Update Medicine Stock!\033[0m")            
-
-
-
-
-
-
-       
-       
-       
-       
-    
+            if m.mid == mid:
+                price = float(input("Enter New Price: "))
+                qty = int(input("Enter New Quantity: "))
+                m.price = price
+                m.qty = qty
+                
+                self.save_data()
+            print("\033[92Update Medicine Stock\033[0m")  
+            return
+        print("\033[92m Medicine NOt Found!\033[0m")          
+        
         # Create object 
 manage = Manage_Medicine()
         
