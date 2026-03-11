@@ -88,7 +88,7 @@ class Manage_Medicine: #class
                 self.medicines.remove(m)
                  # Add + fix
                 self.save_data()
-                print("\033[92Medicine Deleted!\033[m0")
+                print("\033[92mMedicine Deleted!\033[0m")
                 return
         print("\033[91mMedicine Not found!\033[0m")
            
