@@ -85,7 +85,15 @@ class Sale:
         df.to_csv(self.FILE, index=False)
         print("Sale Deleted Successfully!")
     def show_charts(self):
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size ==0:
+            print("No sale data to display charts")
+            return
         df = pd.read_csv(self.FILE)
+        if df.empty:
+            print("Sale CSV is empty)
+        df["Total"] = pd.to_numeric(df["Total"], errors="coerce")
+        df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
+        df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
         df = df.dropna(subset=["Date"])
         # Create daily period
