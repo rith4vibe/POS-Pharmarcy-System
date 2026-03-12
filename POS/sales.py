@@ -79,7 +79,7 @@ class Sale:
         if not found:
             print("SaleID not found.")
             return
-    def show_charts():
+    def show_charts(self):
     """
     Daily chart analysis
     """
