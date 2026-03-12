@@ -13,6 +13,8 @@ class Sale:
                 writer.writerow(["SaleID", "MedicineName", "Price", "Quantity", "Total", "Date"])
     def get_sale_ids(self):
         ids = set()
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
+            return ids
         with open(self.FILE, "r", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -20,7 +22,6 @@ class Sale:
         return ids
     def make_sale(self):
         sale_id = input("Enter Sale ID: ").strip()
-
         if sale_id in self.get_sale_ids():
             print("Sale ID already exists.")
             return
@@ -41,11 +42,13 @@ class Sale:
             writer.writerow([sale_id, name, price, qty, total, date])
         print("Sale Saved!")
     def view_sales(self):
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
+            print("No sales to display.")
+            return
         with open(self.FILE, "r", newline="") as f:
             reader = csv.DictReader(f)
             print(f"{'SaleID':<10} {'MedicineName':<20} {'Price':<10} {'Qty':<10} {'Total':<10} {'Date'}")
             print("-" * 75)
-
             for row in reader:
                 print(
                     f"{row['SaleID']:<10} "
@@ -58,6 +61,9 @@ class Sale:
     def search_sale(self):
         keyword = input("Enter SaleID or Medicine Name: ").strip().lower()
         found = False
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
+            print("No sales to search.")
+            return
         with open(self.FILE, "r", newline="") as f:
             reader = csv.DictReader(f)
             print(f"{'SaleID':<10} {'MedicineName':<20} {'Price':<10} {'Qty':<10} {'Total':<10} {'Date'}")
@@ -77,6 +83,9 @@ class Sale:
             print("No matching sales found.")
     def delete_sale(self):
         sale_id = input("Enter SaleID to delete: ").strip()
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
+            print("No sales to delete.")
+            return
         df = pd.read_csv(self.FILE)
         if sale_id not in df["SaleID"].astype(str).values:
             print("SaleID not found!")
@@ -85,24 +94,25 @@ class Sale:
         df.to_csv(self.FILE, index=False)
         print("Sale Deleted Successfully!")
     def show_charts(self):
-        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size ==0:
-            print("No sale data to display charts")
+        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
+            print("No sale data to display charts.")
             return
         df = pd.read_csv(self.FILE)
         if df.empty:
-            print("Sale CSV is empty)
+            print("Sale CSV is empty.")
+            return
+        # Ensure numeric fields
         df["Total"] = pd.to_numeric(df["Total"], errors="coerce")
         df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
         df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
         df = df.dropna(subset=["Date"])
-        # Create daily period
+        if df.empty:
+            print("No valid sales data to plot.")
+            return
         df["Period"] = df["Date"].dt.date.astype(str)
-        # Daily revenue
         revenue = df.groupby("Period")["Total"].sum().reset_index()
-        # Top medicines
         top_medicine = df.groupby("MedicineName")["Quantity"].sum().reset_index()
-        # Sales distribution
         sales_dist = df.groupby("MedicineName")["Total"].sum().reset_index()
         fig = make_subplots(
             rows=2,
@@ -113,37 +123,20 @@ class Sale:
             ],
             subplot_titles=("Daily Revenue", "Sales Distribution", "Top Selling Medicines")
         )
-        # Line chart
+        # Line chart for daily revenue
         fig.add_trace(
-            go.Scatter(
-                x=revenue["Period"],
-                y=revenue["Total"],
-                mode="lines+markers",
-                name="Revenue"
-            ),
+            go.Scatter(x=revenue["Period"], y=revenue["Total"], mode="lines+markers", name="Revenue"),
             row=1, col=1
         )
-        # Pie chart
+        # Pie chart for sales distribution
         fig.add_trace(
-            go.Pie(
-                labels=sales_dist["MedicineName"],
-                values=sales_dist["Total"],
-                name="Sales Distribution"
-            ),
+            go.Pie(labels=sales_dist["MedicineName"], values=sales_dist["Total"], name="Sales Distribution"),
             row=1, col=2
         )
-        # Bar chart
+        # Bar chart for top selling medicines
         fig.add_trace(
-            go.Bar(
-                x=top_medicine["MedicineName"],
-                y=top_medicine["Quantity"],
-                name="Top Selling"
-            ),
+            go.Bar(x=top_medicine["MedicineName"], y=top_medicine["Quantity"], name="Top Selling"),
             row=2, col=1
         )
-        fig.update_layout(
-            height=700,
-            width=900,
-            title_text="Pharmacy POS Daily Analytics Dashboard"
-        )
+        fig.update_layout(height=700, width=900, title_text="Pharmacy POS Daily Analytics Dashboard")
         fig.show()
