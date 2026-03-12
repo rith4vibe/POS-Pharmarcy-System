@@ -6,11 +6,9 @@ class Product: #class
         self.name = name
         self.price = price
         self.qty = qty
-
-    def display(self): #display  // I have to fix  this display
+    
+    def display(self): # Display 
         # FIXED
-        print(f"{'ID':<5} | {'Name':<20} | {'Price':<8} | {'Qty':<8}")
-        print("-"*50)
         print(f"{self.mid:<5} | {self.name:<20} | ${self.price:<8} | {self.qty:<8}")
 
 
@@ -43,16 +41,23 @@ class Manage_Medicine: #class
         self.load_data()
 
     #///////////////////////////////////////////////////////////
+        
         # Add Medicine
     def add_medicine(self):
-        print("\n=====ADD MEDICINE======")
+        print("\n================ADD MEDICINE=====================")
         mid = input("Enter Medicine ID: ")
+        # Check duplicate ID
+        for m in self.medicines:
+            if m.mid == mid:
+                print("\033[091mID Already Exits!\033[0m")
+                return
+        
         name = input("Enter Medicine Name: ")
         price = float (input("Enter Medicine Price: "))
         qty = int(input("Enter Medicine Quantity: "))
 
-        medicines = Product(mid,name,price,qty)
-        self.medicines.append(medicines)
+        medicine = Product(mid, name, price, qty)
+        self.medicines.append(medicine)
         #add + fix 
         self.save_data()
         #color
@@ -65,12 +70,14 @@ class Manage_Medicine: #class
         if len(self.medicines) == 0:
             print("\033[91mNo Medicines Available.\033[0m")
         else:
-            for m in self.medicines:
+            print(f"{'ID':<5} | {'NAME':<20} | {'PRICE':<8} | {'QUANTITY':<8}")
+            print("-"*50)
+            for m in sorted(self.medicines, key = lambda m: int(m.mid)):
                 m.display()
 
         # Search Medicine
     def search_medicine(self):
-        print("\n=====SEARCH MEDICINES=====")
+        print("\n=================SEARCH MEDICINES===================")
         mid = input("Enter Medicine ID: ")
         for m in self.medicines:
             if m.mid == mid:
@@ -81,7 +88,7 @@ class Manage_Medicine: #class
 
         # Delete Medicine
     def delete_medicine(self):
-        print("\n=====DELETE MEDICINES=====")
+        print("\n=================DELETE MEDICINES=====================")
         mid =input("Enter ID Medicine To Delete: ")
         for m in self.medicines:
             if m.mid == mid:
@@ -95,7 +102,7 @@ class Manage_Medicine: #class
 
         # Update Medicine Stock
     def update_medicine_stock(self):
-        print("\n=====UPDATE MEDICINE STOCK=====")
+        print("\n==================UPDATE MEDICINE STOCK=================")
 
         mid = input("Enter Medicine ID: ")
         
@@ -107,16 +114,16 @@ class Manage_Medicine: #class
                 m.qty = qty
                 
                 self.save_data()
-            print("\033[92Update Medicine Stock\033[0m")  
-            return
-        print("\033[92m Medicine NOt Found!\033[0m")          
+                print("\033[92mMedicine Update Successfully\033[0m")  
+                return
+        print("\033[93mMedicine NOt Found!\033[0m")          
         
         # Create object 
 manage = Manage_Medicine()
         
         #main menu
 while True:
-    print("\n=====MANAGE PRODUCTS=====")
+    print("\n=======================MANAGE PRODUCTS=========================")
     print("1. Add Medicine.")
     print("2. View Medicine.")
     print("3. Search Medicine.")
