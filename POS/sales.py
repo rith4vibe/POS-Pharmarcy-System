@@ -20,6 +20,7 @@ class Sale:
         return ids
     def make_sale(self):
         sale_id = input("Enter Sale ID: ").strip()
+
         if sale_id in self.get_sale_ids():
             print("Sale ID already exists.")
             return
@@ -44,9 +45,16 @@ class Sale:
             reader = csv.DictReader(f)
             print(f"{'SaleID':<10} {'MedicineName':<20} {'Price':<10} {'Qty':<10} {'Total':<10} {'Date'}")
             print("-" * 75)
+
             for row in reader:
-                print(f"{row['SaleID']:<10} {row['MedicineName']:<20} {float(row['Price']):<10.2f} "
-                      f"{row['Quantity']:<10} {float(row['Total']):<10.2f} {row['Date']}")
+                print(
+                    f"{row['SaleID']:<10} "
+                    f"{row['MedicineName']:<20} "
+                    f"{float(row['Price']):<10.2f} "
+                    f"{row['Quantity']:<10} "
+                    f"{float(row['Total']):<10.2f} "
+                    f"{row['Date']}"
+                )
     def search_sale(self):
         keyword = input("Enter SaleID or Medicine Name: ").strip().lower()
         found = False
@@ -56,8 +64,14 @@ class Sale:
             print("-" * 75)
             for row in reader:
                 if keyword in row["SaleID"].lower() or keyword in row["MedicineName"].lower():
-                    print(f"{row['SaleID']:<10} {row['MedicineName']:<20} {float(row['Price']):<10.2f} "
-                          f"{row['Quantity']:<10} {float(row['Total']):<10.2f} {row['Date']}")
+                    print(
+                        f"{row['SaleID']:<10} "
+                        f"{row['MedicineName']:<20} "
+                        f"{float(row['Price']):<10.2f} "
+                        f"{row['Quantity']:<10} "
+                        f"{float(row['Total']):<10.2f} "
+                        f"{row['Date']}"
+                    )
                     found = True
         if not found:
             print("No matching sales found.")
@@ -71,21 +85,27 @@ class Sale:
         df.to_csv(self.FILE, index=False)
         print("Sale Deleted Successfully!")
     def show_charts(self):
-        """
-        Daily chart analysis
-        """
         df = pd.read_csv(self.FILE)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df = df.dropna(subset=["Date"])
+        # Create daily period
         df["Period"] = df["Date"].dt.date.astype(str)
+        # Daily revenue
         revenue = df.groupby("Period")["Total"].sum().reset_index()
+        # Top medicines
         top_medicine = df.groupby("MedicineName")["Quantity"].sum().reset_index()
+        # Sales distribution
         sales_dist = df.groupby("MedicineName")["Total"].sum().reset_index()
         fig = make_subplots(
-            rows=2, cols=2,
-            specs=[[{"type": "xy"}, {"type": "domain"}],
-                   [{"colspan": 2, "type": "xy"}, None]],
+            rows=2,
+            cols=2,
+            specs=[
+                [{"type": "xy"}, {"type": "domain"}],
+                [{"colspan": 2, "type": "xy"}, None]
+            ],
             subplot_titles=("Daily Revenue", "Sales Distribution", "Top Selling Medicines")
         )
+        # Line chart
         fig.add_trace(
             go.Scatter(
                 x=revenue["Period"],
@@ -95,6 +115,7 @@ class Sale:
             ),
             row=1, col=1
         )
+        # Pie chart
         fig.add_trace(
             go.Pie(
                 labels=sales_dist["MedicineName"],
@@ -103,6 +124,7 @@ class Sale:
             ),
             row=1, col=2
         )
+        # Bar chart
         fig.add_trace(
             go.Bar(
                 x=top_medicine["MedicineName"],
@@ -110,11 +132,10 @@ class Sale:
                 name="Top Selling"
             ),
             row=2, col=1
-        ) 
+        )
         fig.update_layout(
             height=700,
             width=900,
             title_text="Pharmacy POS Daily Analytics Dashboard"
         )
-
         fig.show()
