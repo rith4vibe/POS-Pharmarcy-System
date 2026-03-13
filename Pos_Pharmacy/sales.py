@@ -25,7 +25,7 @@ class Sale:
         return ids
 
     def make_sale(self, manage_medicine):
-        # Step 1: Select Medicine by ID
+
         mid = input("Enter Medicine ID: ").strip()
         product = None
         for m in manage_medicine.medicines:
@@ -39,7 +39,6 @@ class Sale:
 
         print(f"Medicine: {product.name} | Price: {product.price} | Stock: {product.qty}")
 
-        # Step 2: Enter quantity
         try:
             qty = int(input("Enter Quantity to sell: "))
         except ValueError:
@@ -53,20 +52,17 @@ class Sale:
             print(f"\033[91mNot enough stock! Available: {product.qty}\033[0m")
             return
 
-        # Step 3: Enter unique Sale ID
         sale_id = input("Enter Sale ID: ").strip()
         if sale_id in self.get_sale_ids():
             print("\033[91mSale ID already exists!\033[0m")
             return
 
-        # Step 4: Calculate total and save sale
         total = product.price * qty
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(self.FILE, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([sale_id, product.name, product.price, qty, total, date])
 
-        # Step 5: Reduce stock and save medicine data
         product.qty -= qty
         manage_medicine.save_data()
 
@@ -89,31 +85,6 @@ class Sale:
                     f"{float(row['Total']):<10.2f} "
                     f"{row['Date']}"
                 )
-
-    def search_sale(self):
-        keyword = input("Enter SaleID or Medicine Name: ").strip().lower()
-        found = False
-        if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
-            print("No sales to search.")
-            return
-        with open(self.FILE, "r", newline="") as f:
-            reader = csv.DictReader(f)
-            print(f"{'SaleID':<10} {'MedicineName':<20} {'Price':<10} {'Qty':<10} {'Total':<10} {'Date'}")
-            print("-" * 75)
-            for row in reader:
-                if keyword in row["SaleID"].lower() or keyword in row["MedicineName"].lower():
-                    print(
-                        f"{row['SaleID']:<10} "
-                        f"{row['MedicineName']:<20} "
-                        f"{float(row['Price']):<10.2f} "
-                        f"{row['Quantity']:<10} "
-                        f"{float(row['Total']):<10.2f} "
-                        f"{row['Date']}"
-                    )
-                    found = True
-        if not found:
-            print("No matching sales found.")
-
     def delete_sale(self):
         sale_id = input("Enter SaleID to delete: ").strip()
         if not os.path.exists(self.FILE) or os.stat(self.FILE).st_size == 0:
@@ -135,7 +106,7 @@ class Sale:
         if df.empty:
             print("Sale CSV is empty.")
             return
-        # Ensure numeric fields
+        
         df["Total"] = pd.to_numeric(df["Total"], errors="coerce")
         df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
         df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
@@ -177,9 +148,8 @@ class Sale:
             print("\n=========== SALES MENU ===========")
             print("1. Make Sale")
             print("2. View Sales")
-            print("3. Search Sale")
-            print("4. Delete Sale")
-            print("5. Show Analytics Chart")
+            print("3. Delete Sale")
+            print("4. Show Analytics Chart")
             print("0. Back")
 
             choice = input("Choose Option: ")
@@ -189,10 +159,8 @@ class Sale:
             elif choice == "2":
                 self.view_sales()
             elif choice == "3":
-                self.search_sale()
-            elif choice == "4":
                 self.delete_sale()
-            elif choice == "5":
+            elif choice == "4":
                 self.show_charts()
             elif choice == "0":
                 break
