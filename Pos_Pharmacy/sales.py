@@ -149,7 +149,7 @@ class Sale:
             print("3. Search Sale")
             print("4. Delete Sale")
             print("5. Show Analytics Chart")
-            print("0. Back")
+            print("0. Go back to menu")
 
             choice = input("Choose Option: ")
 
