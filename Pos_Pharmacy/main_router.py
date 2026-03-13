@@ -27,7 +27,7 @@ def main_router():
             manage = Manage_Medicine()
             manage.menu()
         elif choice == "2":
-            sale.menu()
+            sale.menu(manage)
 
         elif choice == "3":
             print("\033[91mExit Programming, Thanks....\033[0m")
