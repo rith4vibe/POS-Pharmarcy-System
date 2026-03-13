@@ -1,0 +1,153 @@
+#DAY1
+import csv
+class Product: #class 
+    def __init__(self,mid,name,price,qty,): #constructor
+        self.mid = mid
+        self.name = name
+        self.price = price
+        self.qty = qty
+    
+    def display(self): # Display 
+        # FIXED
+        print(f"{self.mid:<5} | {self.name:<20} | ${self.price:<8} | {self.qty:<8}")
+class Manage_Medicine: #class
+    # Read data and store
+# DAY3
+    #///////////////////////////////////////////////////////
+    def save_data(self):
+        with open("medicine.csv","w",newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["ID","Name","Price","Qty"])
+
+            for m in self.medicines:
+                writer.writerow([m.mid,m.name,m.price,m.qty])
+
+    def load_data(self):
+        try:
+            with open("medicine.csv","r") as file:
+                reader = csv.reader(file)
+                next(reader)
+
+                for row in reader:
+                    medicine = Product(row[0],row[1],float(row[2]),int(row[3]))
+                    self.medicines.append(medicine)
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            print(f"\033[91mError loading data: {e}\033[0m")
+    
+    def __init__(self):
+        self.medicines = []
+        self.load_data()
+
+    #///////////////////////////////////////////////////////////
+        
+        # Add Medicine
+    def add_medicine(self):
+        print("\n================ADD MEDICINE=====================")
+        mid = input("Enter Medicine ID: ")
+        # Check duplicate ID
+        for m in self.medicines:
+            if m.mid == mid:
+                print("\033[091mID Already Exits!\033[0m")
+                return
+        
+        name = input("Enter Medicine Name: ")
+        try:
+            price = float (input("Enter Medicine Price: "))
+            qty = int(input("Enter Medicine Quantity: "))
+        except ValueError:
+            print("\033[91mInvalid input. Price must be a number and Quantity must be an integer.\033[0m")
+            return
+
+        medicine = Product(mid, name, price, qty)
+        self.medicines.append(medicine)
+        #add + fix 
+        self.save_data()
+        #color
+        print("\033[92mMedicine Added Seccessfully!\033[0m")
+        input("Press Enter to continue...")
+      
+#DAY2
+        # View Medicine
+    def view_medicine(self):
+        print("\n=================MEDICINES LIST===================")
+        if len(self.medicines) == 0:
+            print("\033[93mNo Medicines Available.\033[0m")
+        else:
+            print(f"{'ID':<5} | {'NAME':<20} | {'PRICE':<8} | {'QUANTITY':<8}")
+            print("-"*50)
+            for m in sorted(self.medicines, key = lambda m: int(m.mid)):
+                m.display()
+
+        # Search Medicine
+    def search_medicine(self):
+        print("\n=================SEARCH MEDICINES===================")
+        mid = input("Enter Medicine ID: ")
+        for m in self.medicines:
+            if m.mid == mid:
+                m.display()
+                return
+        print("\033[91mMedicine not found!\033[0m")
+        # Delete Medicine
+    def delete_medicine(self):
+        print("\n=================DELETE MEDICINES=====================")
+        mid =input("Enter ID Medicine To Delete: ")
+        for m in self.medicines:
+            if m.mid == mid:
+                self.medicines.remove(m)
+                 # Add + fix
+                self.save_data()
+                print("\033[92mMedicine Deleted!\033[0m")
+                input("Press Enter to continue...")
+                return
+        print("\033[91mMedicine Not found!\033[0m")
+        # Update Medicine Stock
+    def update_medicine_stock(self):
+        print("\n==================UPDATE MEDICINE STOCK=================")
+        mid = input("Enter Medicine ID: ")
+        for m in self.medicines:
+            if m.mid == mid:
+                try:    
+                    price = float(input("Enter New Price: "))
+                    qty = int(input("Enter New Quantity: "))
+                except ValueError:
+                    print("\033[91mInvalid input. Price must be a number and Quantity must be an integer.\033[0m")
+                    return
+                m.price = price
+                m.qty = qty
+                
+                self.save_data()
+                print("\033[92mMedicine Update Successfully\033[0m")
+                input("Press Enter to continue...")  
+                return
+        print("\033[93mMedicine NOt Found!\033[0m")          
+        
+        # Create object 
+    #manage = Manage_Medicine()
+        
+    def menu(self):        #main menu
+        while True:
+            print("\n=======================MANAGE PRODUCTS=========================")
+            print("1. Add Medicine.")
+            print("2. View Medicine.")
+            print("3. Search Medicine.")
+            print("4. Delete Medicine.")
+            print("5. Update Medicine Stock.")
+            print("0. Back.")
+
+            choice = input("Chose Option:")
+            if choice == "1":
+                self.add_medicine()
+            elif choice == "2":
+                self.view_medicine()
+            elif choice == "3":
+                self.search_medicine()
+            elif choice == "4":
+                self.delete_medicine()
+            elif choice == "5":
+                self.update_medicine_stock()
+            elif choice == "0":
+                break
+            else:
+                print("\033[91mInvalid Choice!\033[0m")    
