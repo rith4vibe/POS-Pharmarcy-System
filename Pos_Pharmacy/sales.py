@@ -30,7 +30,7 @@ class Sale:
             price = float(input("Enter Price: "))
             qty = int(input("Enter Quantity: "))
         except ValueError:
-            print("Invalid input for price or quantity.")
+            print("Invalid input. Try again.")
             return
         if price <= 0 or qty <= 0:
             print("Price and quantity must be positive.")
