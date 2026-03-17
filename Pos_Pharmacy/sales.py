@@ -155,7 +155,7 @@ class Sale:
             choice = input("Choose Option: ")
 
             if choice == "1":
-                self.make_sale(manage_medicine)  # <-- pass Manage_Medicine instance here
+                self.make_sale(manage_medicine)
             elif choice == "2":
                 self.view_sales()
             elif choice == "3":
